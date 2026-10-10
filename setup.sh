@@ -3,10 +3,8 @@
 #exit 1 - Erro com a senha sudo.
 #exit 2 - Erro com o instalador de pacotes.
 
-
 has_flatpak=0
 install=("dnf install -y" "apt install -y" "yum install -y" "pacman -S --noconfirm" "zypper install -y" "emerge" "apk add" "pkg install -y" "brew install -y" "snap install -y") 
-
 
 echo "--- INSTALADOR DE AMBIENTE FLATPAK ---"
 
@@ -32,8 +30,7 @@ if [ $has_flatpak -eq 1 ]; then
     sudo $inst flatpak
 
         if [ $? -eq 0]; then
-            has_flatpak=3
-            echo "Flatpak"
+            echo "Flatpak Instalado"
             break
         fi
 
@@ -99,20 +96,19 @@ flatpak_install_apps=(
     )
 
 for flatpak_item in "${flatpak_install_apps[@]}"; do
-if flatpak info "$flatpak_item" >/dev/null 2>&1; then
-    echo "[=] Já instalado: $flatpak_item"
+    if flatpak info "$flatpak_item" >/dev/null 2>&1; then
+        echo "[=] Já instalado: $flatpak_item"
 
-else
-    flatpak install -y flathub $flatpak_item
-    if [ $? -eq 0 ]; then
-        echo "[+] Instalado com sucesso: $flatpak_item"
-        else
-        echo "[X] Erro inexperado com o pacote: $flatpak_item"
+    else
+        flatpak install -y flathub $flatpak_item
+        if [ $? -eq 0 ]; then
+            echo "[+] Instalado com sucesso: $flatpak_item"
+            else
+            echo "[X] Erro inexperado com o pacote: $flatpak_item"
+        fi
     fi
-fi
-
-
 done
+
 echo "--- INTALADOR DE AMBIENTE FLATPAK FINALIZADO ---"
 
 kill $KEEP_ALIVE_PID
