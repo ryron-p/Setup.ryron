@@ -48,11 +48,9 @@ if [ $has_flatpak -eq 1 ]; then
     done
 fi
 # Adiciona rota flathub para downloads
-if [ $? -eq 0 ]; then
-    flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo >/dev/null 2>&1
-    echo "[+] Rota para o repositório flathub verificada."
+flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo >/dev/null 2>&1
+echo "[+] Rota para o repositório flathub verificada."
 
-fi
 
 # Encerrando com falha de instalação
 if [ $has_flatpak -eq 2 ]; then
