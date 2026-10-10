@@ -33,7 +33,7 @@ if [ $has_flatpak -eq 1 ]; then
     for inst in "${install[@]}"; do
     sudo $inst flatpak
 
-        if [ $? -eq 0]; then
+        if [ $? -eq 0 ]; then
             echo "Flatpak Instalado"
             has_flatpak=3
             break
