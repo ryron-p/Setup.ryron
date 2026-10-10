@@ -4,9 +4,13 @@
 #exit 2 - Erro com o instalador de pacotes.
 
 
-#has_flatpak=3 - Flatpak instalado
+#has_flatpak=0   # tem flatpak
+#has_flatpak=1   # não tem, precisa baixar
+#has_flatpak=2   # tentou baixar, pode ter falhado
+#has_flatpak=3   # conseguiu instalar
 
 has_flatpak=0
+
 install=("dnf install -y" "apt install -y" "yum install -y" "pacman -S --noconfirm" "zypper install -y" "emerge" "apk add" "pkg install -y" "brew install -y" "snap install -y") 
 
 echo "--- INSTALADOR DE AMBIENTE FLATPAK ---"
@@ -24,33 +28,39 @@ fi
 
 # Requisitando Senha
 sudo -v || { echo "Senha incorreta ou sudo indisponível. Abortando."; exit 1; }
+
 # Renovando permissão root automaticamente
 while true; do sudo -n true; sleep 50; kill -0 "$$" || exit; done 2>/dev/null &
 KEEP_ALIVE_PID=$!
 
 # Instalando Flatpak
 if [ $has_flatpak -eq 1 ]; then
-    has_flatpak=1
+    has_flatpak=2
     for inst in "${install[@]}"; do
     sudo $inst flatpak
 
         if [ $? -eq 0 ]; then
-            echo "Flatpak Instalado"
+            echo "[+] Flatpak Instalado."
             has_flatpak=3
             break
         fi
 
     done
 fi
+# Adiciona rota flathub para downloads
+if [ $? -eq 0 ]; then
+    flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo >/dev/null 2>&1
+    echo "[+] Rota para o repositório flathub verificada."
 
+fi
+
+# Encerrando com falha de instalação
 if [ $has_flatpak -eq 2 ]; then
-    echo "Seu instalador não conseguiu baixar o flatpak."
+    echo "Seu instalador não conseguiu baixar o Flatpak."
     echo "Encerrando processo..."
     exit 2
 fi
 
-# Adiciona rota flathub para downloads
-flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo >/dev/null 2>&1
 
 
 # Flatpak Install
@@ -108,7 +118,7 @@ for flatpak_item in "${flatpak_install_apps[@]}"; do
         echo "[=] Já instalado: $flatpak_item"
 
     else
-        flatpak install -y flathub $flatpak_item
+        flatpak install -y flathub "$flatpak_item"
         if [ $? -eq 0 ]; then
             echo "[+] Instalado com sucesso: $flatpak_item"
             else
