@@ -21,6 +21,7 @@ else
     has_flatpak=1
 fi
 
+
 # Requisitando Senha
 sudo -v || { echo "Senha incorreta ou sudo indisponível. Abortando."; exit 1; }
 # Renovando permissão root automaticamente
@@ -47,6 +48,9 @@ if [ $has_flatpak -eq 2 ]; then
     echo "Encerrando processo..."
     exit 2
 fi
+
+# Adiciona rota flathub para downloads
+flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo >/dev/null 2>&1
 
 
 # Flatpak Install
