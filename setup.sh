@@ -3,6 +3,9 @@
 #exit 1 - Erro com a senha sudo.
 #exit 2 - Erro com o instalador de pacotes.
 
+
+#has_flatpak=3 - Flatpak instalado
+
 has_flatpak=0
 install=("dnf install -y" "apt install -y" "yum install -y" "pacman -S --noconfirm" "zypper install -y" "emerge" "apk add" "pkg install -y" "brew install -y" "snap install -y") 
 
@@ -26,15 +29,16 @@ KEEP_ALIVE_PID=$!
 
 # Instalando Flatpak
 if [ $has_flatpak -eq 1 ]; then
+    has_flatpak=1
     for inst in "${install[@]}"; do
     sudo $inst flatpak
 
         if [ $? -eq 0]; then
             echo "Flatpak Instalado"
+            has_flatpak=3
             break
         fi
 
-    has_flatpak=2
     done
 fi
 
