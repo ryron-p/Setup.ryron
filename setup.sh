@@ -1,15 +1,14 @@
 #!/bin/bash
 
-#exit 1 - Erro com a senha sudo.
-#exit 2 - Erro com o instalador de pacotes.
+# exit 1 - Sudo Error
+# exit 2 - Package Installer Error.
 
-
-
+# flatpak_available=0   # Found Flatpak.
+# flatpak_available=1   # Not found Flatpak. 
 flatpak_available=0
-#flatpak_available=0   # Flatpak encontrado.
-#flatpak_available=1   # Flatpak não encontrado. 
 
-n=0 # Escolha de tipos de intalação
+# Type of installation (1..4)
+n=0 
 
 
 # Install Setups
@@ -19,6 +18,7 @@ game_setup=0
 work_setup=0 
 leisure_setup=0
 
+# List of package installers
 install=(
     "dnf install -y"
     "apt install -y"
@@ -85,14 +85,14 @@ flatpak_install_leisure_setup=(
 # VLC
 
 
-echo "--- INSTALADOR DE AMBIENTE FLATPAK ---"
+echo "=== FLATPAK INSTALLER ==="
 
-echo "Tipo de instalação:"
-echo "1. Completa"
-echo "2. Apenas trabalho"
-echo "3. Apenas jogos"
-echo "4. Apenas lazer"
-read -p "Digite um número (1..4) -> " n
+echo "Type of installation:"
+echo "1. Full"
+echo "2. Work only"
+echo "3. Games only"
+echo "4. Leisure only"
+read -p "Enter a number (1..4) -> " n
 
 if [ $n -eq 1 ]; then
     game_setup=1
@@ -105,27 +105,27 @@ elif [ $n -eq 3 ]; then
 elif [ $n -eq 4 ]; then
     leisure_setup=1
 else
-    echo "Opção inválida. Abortando o programa..."
+    echo "Invalid option. Closing program..."
     exit
 fi
 
 
 
-# Requisitando Senha
-sudo -v || { echo "Senha incorreta ou sudo indisponível. Abortando."; exit 1; }
+# Password Request
+sudo -v || { echo "Incorrect password or sudo required. Aborting."; exit 1; }
 
-# Renovando permissão root automaticamente
+# Automatically renew root permission
 while true; do sudo -n true; sleep 50; kill -0 "$$" || exit; done 2>/dev/null &
 KEEP_ALIVE_PID=$!
 
-#Verificando a existência do comando flatpak
+# Checking for the existence of the flatpak command
 command -v flatpak >/dev/null 2>&1
 if [ $? -eq 0 ]; then
-    echo "-- Flatpak encontrado!"
+    echo "-- Flatpak found!"
     
     else
-        echo "-- Flatpak não encontrado."
-        echo "-- Tentando baixar.."
+        echo "-- Flatpak not found."
+        echo "-- Trying install.."
         flatpak_available=1
     
     
@@ -134,83 +134,88 @@ if [ $? -eq 0 ]; then
         sudo $inst flatpak
         
         if [ $? -eq 0 ]; then
-            echo "[+] Flatpak Instalado."
+            echo "[+] Flatpak Installed."
             flatpak_available=0
             break
         fi
 
     done
-        # Falha de instalação: Encerrando o programa
+        # Installation Failed: Terminating the Program
         if [ $flatpak_available -eq 1 ]; then
-            echo "Seu instalador não conseguiu baixar o Flatpak."
-            echo "Encerrando programa..."
+            echo "Your package manager was unable to download Flatpak."
+            echo "Closing program..."
             exit 2
         fi
 fi
 
 
 
-# Adiciona rota flathub para downloads
+# Adding flathub route to flatpak
 if flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo >/dev/null 2>&1; then
-    echo "[+] Rota para o repositório flathub verificada/adicionada."
+    echo "[+] Route to flathub repository checked/added."
 else
-    echo "[-] Erro ao tentar verificar/adicionar a rota para o repositório flathub"
+    echo "[-] Error when trying to check/add route to flathub repository"
 fi
 
 
-#----------------------#
-#---   Instalação   ---#
-#----------------------#
+#--- Installation
 
+# Messages
+msg_already_installed="[=] Already installed"
+msg_successfully_installed="[+] Installed successfully"
+msg_unexpected_error="[X] Unexpected error with package"
 
+# Work Setup
 if [ $work_setup -eq 1 ]; then
     for flatpak_item in "${flatpak_install_work_setup[@]}"; do
         if flatpak info "$flatpak_item" >/dev/null 2>&1; then
-            echo "[=] Já instalado: $flatpak_item"
+            echo "$msg_already_installed: $flatpak_item"
 
         else
             flatpak install -y flathub "$flatpak_item"
             if [ $? -eq 0 ]; then
-                echo "[+] Instalado com sucesso: $flatpak_item"
+                echo "$msg_successfully_installed: $flatpak_item"
                 else
-                echo "[X] Erro inexperado com o pacote: $flatpak_item"
+                echo "$msg_unexpected_error: $flatpak_item"
             fi
         fi
     done
 fi
 
+# Games Setup
 if [ $game_setup -eq 1 ]; then
     for flatpak_item in "${flatpak_install_game_setup[@]}"; do
         if flatpak info "$flatpak_item" >/dev/null 2>&1; then
-            echo "[=] Já instalado: $flatpak_item"
+            echo "$msg_already_installed: $flatpak_item"
 
         else
             flatpak install -y flathub "$flatpak_item"
             if [ $? -eq 0 ]; then
-                echo "[+] Instalado com sucesso: $flatpak_item"
+                echo "$msg_successfully_installed: $flatpak_item"
                 else
-                echo "[X] Erro inexperado com o pacote: $flatpak_item"
+                echo "$msg_unexpected_error: $flatpak_item"
             fi
         fi
     done
 fi
 
+# Leisure Setup
 if [ $leisure_setup -eq 1 ]; then
     for flatpak_item in "${flatpak_install_leisure_setup[@]}"; do
         if flatpak info "$flatpak_item" >/dev/null 2>&1; then
-            echo "[=] Já instalado: $flatpak_item"
+            echo "$msg_already_installed: $flatpak_item"
 
         else
             flatpak install -y flathub "$flatpak_item"
             if [ $? -eq 0 ]; then
-                echo "[+] Instalado com sucesso: $flatpak_item"
+                echo "$msg_successfully_installed: $flatpak_item"
                 else
-                echo "[X] Erro inexperado com o pacote: $flatpak_item"
+                echo "$msg_unexpected_error: $flatpak_item"
             fi
         fi
     done
 fi
 
-echo "--- INTALADOR DE AMBIENTE FLATPAK FINALIZADO ---"
+echo "=== FLATPAK INSTALLER FINISHED ==="
 
 kill $KEEP_ALIVE_PID
