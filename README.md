@@ -1,7 +1,8 @@
 # Setup.ryron
-Instalador bash para linux, onde todos aplicativos que utilizo a trabalho e lazer são instalados de forma prática. 
+Bash installer for Linux, where all the applications I use are installed conveniently.
+The list of applications includes:
 
-A lista de aplicativos inclui:
+#### Work
 
 - Flatseal
 - Obsidian 
@@ -11,14 +12,17 @@ A lista de aplicativos inclui:
 - VLC
 - Tor Browser
 - Brave Browser
-- qBittorrent
-- MKVToolNix
 - RustDesk
+- Tenacity
+
+#### Leisure
+- MKVToolNix
 - Foliate
 - Rufin
-- Tenacity
-- Proton VPN
+- qBittorrent
+- VLC
 
+#### Games
 - Sober
 - Steam
 - Missingno
