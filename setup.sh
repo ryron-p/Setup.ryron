@@ -9,6 +9,16 @@ flatpak_available=0
 #flatpak_available=0   # Flatpak encontrado.
 #flatpak_available=1   # Flatpak não encontrado. 
 
+n=0 # Escolha de tipos de intalação
+
+
+# Install Setups
+# 0 = none 
+# 1 = install                
+game_setup=0 
+work_setup=0 
+leisure_setup=0
+
 install=(
     "dnf install -y"
     "apt install -y"
@@ -20,22 +30,18 @@ install=(
     "brew install -y"
     "snap install -y"
     ) 
-flatpak_install_apps=(
+flatpak_install_work_setup=(
     "com.github.tchx84.Flatseal"
     "md.obsidian.Obsidian"
     "com.visualstudio.code"
     "org.onlyoffice.desktopeditors"
     "com.github.vikdevelop.timer"
-    "org.videolan.VLC"
     "org.torproject.torbrowser-launcher"
     "com.brave.Browser"
-    "org.qbittorrent.qBittorrent"
-    "org.bunkus.mkvtoolnix-gui"
     "com.rustdesk.RustDesk"
-    "com.github.johnfactotum.Foliate"
-    "io.github.screwys.Rufin"
     "org.tenacityaudio.Tenacity"
-    "com.protonvpn.www"
+)
+flatpak_install_game_setup=(
     "org.vinegarhq.Sober"
     "com.valvesoftware.Steam"
     "net.andyofniall.missingno"
@@ -43,6 +49,13 @@ flatpak_install_apps=(
     "com.heroicgameslauncher.hgl"
     "xyz.xclicker.xclicker"
     )
+flatpak_install_leisure_setup=(
+    "org.bunkus.mkvtoolnix-gui"
+    "com.github.johnfactotum.Foliate"
+    "io.github.screwys.Rufin"
+    "org.qbittorrent.qBittorrent"
+    "org.videolan.VLC"
+)
 
 # --- Flatpak Install Apps
 # -- Work Apps
@@ -51,16 +64,10 @@ flatpak_install_apps=(
 # Visual Studio Code
 # Only Office
 # Timer
-# VLC
 # Tor Browser
 # Brave Browser
-# qBittorrent
-# MKVToolNix
 # RustDesk
-# Foliate
-# Rufin
 # Tenacity
-# Proton VPN
 
 # -- Game Apps
 # Sober
@@ -70,8 +77,39 @@ flatpak_install_apps=(
 # Heroic
 # XClicker
 
+# -- Leisure Apps
+# MKVToolNix
+# Foliate
+# Rufin
+# qBittorrent
+# VLC
+
 
 echo "--- INSTALADOR DE AMBIENTE FLATPAK ---"
+
+echo "Tipo de instalação:"
+echo "1. Completa"
+echo "2. Apenas trabalho"
+echo "3. Apenas jogos"
+echo "4. Apenas lazer"
+read -p "Digite um número (1..4) -> " n
+
+if [ $n -eq 1 ]; then
+    game_setup=1
+    work_setup=1
+    leisure_setup=1
+elif [ $n -eq 2 ]; then
+    work_setup=1
+elif [ $n -eq 3 ]; then
+    game_setup=1
+elif [ $n -eq 4 ]; then
+    leisure_setup=1
+else
+    echo "Opção inválida. Abortando o programa..."
+    exit
+fi
+
+
 
 # Requisitando Senha
 sudo -v || { echo "Senha incorreta ou sudo indisponível. Abortando."; exit 1; }
@@ -102,7 +140,7 @@ if [ $? -eq 0 ]; then
         fi
 
     done
-        # Encerrando com falha de instalação
+        # Falha de instalação: Encerrando o programa
         if [ $flatpak_available -eq 1 ]; then
             echo "Seu instalador não conseguiu baixar o Flatpak."
             echo "Encerrando programa..."
@@ -120,19 +158,58 @@ else
 fi
 
 
-for flatpak_item in "${flatpak_install_apps[@]}"; do
-    if flatpak info "$flatpak_item" >/dev/null 2>&1; then
-        echo "[=] Já instalado: $flatpak_item"
+#----------------------#
+#---   Instalação   ---#
+#----------------------#
 
-    else
-        flatpak install -y flathub "$flatpak_item"
-        if [ $? -eq 0 ]; then
-            echo "[+] Instalado com sucesso: $flatpak_item"
-            else
-            echo "[X] Erro inexperado com o pacote: $flatpak_item"
+
+if [ $work_setup -eq 1 ]; then
+    for flatpak_item in "${flatpak_install_work_setup[@]}"; do
+        if flatpak info "$flatpak_item" >/dev/null 2>&1; then
+            echo "[=] Já instalado: $flatpak_item"
+
+        else
+            flatpak install -y flathub "$flatpak_item"
+            if [ $? -eq 0 ]; then
+                echo "[+] Instalado com sucesso: $flatpak_item"
+                else
+                echo "[X] Erro inexperado com o pacote: $flatpak_item"
+            fi
         fi
-    fi
-done
+    done
+fi
+
+if [ $game_setup -eq 1 ]; then
+    for flatpak_item in "${flatpak_install_game_setup[@]}"; do
+        if flatpak info "$flatpak_item" >/dev/null 2>&1; then
+            echo "[=] Já instalado: $flatpak_item"
+
+        else
+            flatpak install -y flathub "$flatpak_item"
+            if [ $? -eq 0 ]; then
+                echo "[+] Instalado com sucesso: $flatpak_item"
+                else
+                echo "[X] Erro inexperado com o pacote: $flatpak_item"
+            fi
+        fi
+    done
+fi
+
+if [ $leisure_setup -eq 1 ]; then
+    for flatpak_item in "${flatpak_install_leisure_setup[@]}"; do
+        if flatpak info "$flatpak_item" >/dev/null 2>&1; then
+            echo "[=] Já instalado: $flatpak_item"
+
+        else
+            flatpak install -y flathub "$flatpak_item"
+            if [ $? -eq 0 ]; then
+                echo "[+] Instalado com sucesso: $flatpak_item"
+                else
+                echo "[X] Erro inexperado com o pacote: $flatpak_item"
+            fi
+        fi
+    done
+fi
 
 echo "--- INTALADOR DE AMBIENTE FLATPAK FINALIZADO ---"
 
