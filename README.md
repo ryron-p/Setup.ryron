@@ -9,7 +9,6 @@ The list of applications includes:
 - Visual Studio Code
 - Only Office
 - Timer
-- VLC
 - Tor Browser
 - Brave Browser
 - RustDesk
