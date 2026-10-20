@@ -17,6 +17,7 @@ n=0
 game_setup=0 
 work_setup=0 
 leisure_setup=0
+social_setup=0
 
 # List of package installers
 install=(
@@ -35,7 +36,7 @@ flatpak_install_work_setup=(
     "md.obsidian.Obsidian"
     "com.visualstudio.code"
     "org.onlyoffice.desktopeditors"
-    "com.github.vikdevelop.timer"
+    "org.gnome.clocks"
     "org.torproject.torbrowser-launcher"
     "com.brave.Browser"
     "com.rustdesk.RustDesk"
@@ -56,6 +57,9 @@ flatpak_install_leisure_setup=(
     "org.qbittorrent.qBittorrent"
     "org.videolan.VLC"
 )
+flatpak_install_social_setup=(
+    "com.discordapp.Discord"
+    )
 
 # --- Flatpak Install Apps
 # -- Work Apps
@@ -63,7 +67,7 @@ flatpak_install_leisure_setup=(
 # Obsidian 
 # Visual Studio Code
 # Only Office
-# Timer
+# Clockscom.discordapp.Discord
 # Tor Browser
 # Brave Browser
 # RustDesk
@@ -84,6 +88,9 @@ flatpak_install_leisure_setup=(
 # qBittorrent
 # VLC
 
+#-- Social Apps
+# Discord
+
 
 echo "=== FLATPAK INSTALLER ==="
 
@@ -92,18 +99,22 @@ echo "1. Full"
 echo "2. Work only"
 echo "3. Games only"
 echo "4. Leisure only"
-read -p "Enter a number (1..4) -> " n
+echo "5. Social only"
+read -p "Enter a number (1..5) -> " n
 
 if [ $n -eq 1 ]; then
     game_setup=1
     work_setup=1
     leisure_setup=1
+    social_setup=1
 elif [ $n -eq 2 ]; then
     work_setup=1
 elif [ $n -eq 3 ]; then
     game_setup=1
 elif [ $n -eq 4 ]; then
     leisure_setup=1
+elif [ $n -eq 5 ]; then
+    social_setup=1
 else
     echo "Invalid option. Closing program..."
     exit
@@ -202,6 +213,23 @@ fi
 # Leisure Setup
 if [ $leisure_setup -eq 1 ]; then
     for flatpak_item in "${flatpak_install_leisure_setup[@]}"; do
+        if flatpak info "$flatpak_item" >/dev/null 2>&1; then
+            echo "$msg_already_installed: $flatpak_item"
+
+        else
+            flatpak install -y flathub "$flatpak_item"
+            if [ $? -eq 0 ]; then
+                echo "$msg_successfully_installed: $flatpak_item"
+                else
+                echo "$msg_unexpected_error: $flatpak_item"
+            fi
+        fi
+    done
+fi
+
+# Social Setup
+if [ $social_setup -eq 1 ]; then
+    for flatpak_item in "${flatpak_install_social_setup[@]}"; do
         if flatpak info "$flatpak_item" >/dev/null 2>&1; then
             echo "$msg_already_installed: $flatpak_item"
 
