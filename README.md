@@ -28,3 +28,6 @@ The list of applications includes:
 - RPCS3
 - Heroic
 - XClicker
+
+#### Social
+- Discord
